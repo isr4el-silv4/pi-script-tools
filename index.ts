@@ -8,6 +8,12 @@ const ParamsSchema = Type.Object({
 });
 type Params = Static<typeof ParamsSchema>;
 
+type ToolResult = { content: Array<{ type: "text"; text: string }> };
+
+function textResult(text: string): ToolResult {
+  return { content: [{ type: "text", text }] };
+}
+
 /**
  * Build the tool description from metadata.
  */
@@ -34,7 +40,7 @@ function registerScriptTool(pi: ExtensionAPI, toolName: string, entry: ScriptEnt
       signal: AbortSignal | undefined,
       _onUpdate: unknown,
       ctx: ExtensionContext,
-    ): Promise<{ content: string }> => {
+    ): Promise<ToolResult> => {
       const args = params.args ? params.args.split(" ") : [];
       const childCwd = (ctx as ExtensionContext & { cwd?: string }).cwd || process.cwd();
 
@@ -48,7 +54,7 @@ function registerScriptTool(pi: ExtensionAPI, toolName: string, entry: ScriptEnt
           if (signal instanceof AbortSignal) {
             execOpts.signal = signal;
           }
-          const child = execFile(
+          execFile(
             "bash",
             [entry.path, ...args],
             execOpts,
@@ -68,12 +74,10 @@ function registerScriptTool(pi: ExtensionAPI, toolName: string, entry: ScriptEnt
       );
 
       if (result.code === 0) {
-        return { content: result.stdout };
+        return textResult(result.stdout);
       }
 
-      return {
-        content: `Script exited with code ${result.code}.\n${result.stderr || result.stdout}`,
-      };
+      return textResult(`Script exited with code ${result.code}.\n${result.stderr || result.stdout}`);
     },
   });
 }

@@ -142,7 +142,7 @@ describe("extension", () => {
     const tool = registeredTools[0];
     // Simulate a string signal (the bug scenario)
     const result = await tool.execute("call-1", { args: "" }, "bad-signal" as unknown as AbortSignal, undefined, ctx);
-    expect(result.content).toBe("works\n");
+    expect(result.content).toEqual([{ type: "text", text: "works\n" }]);
   });
 
   it("local scripts override global scripts", async () => {
