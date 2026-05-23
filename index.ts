@@ -40,15 +40,18 @@ function registerScriptTool(pi: ExtensionAPI, toolName: string, entry: ScriptEnt
 
       const result = await new Promise<{ stdout: string; stderr: string; code: number | null }>(
         (resolve) => {
+          const execOpts: { cwd: string; timeout: number; maxBuffer: number; signal?: AbortSignal } = {
+            cwd: childCwd,
+            timeout: entry.timeout,
+            maxBuffer: 10 * 1024 * 1024, // 10MB
+          };
+          if (signal instanceof AbortSignal) {
+            execOpts.signal = signal;
+          }
           const child = execFile(
             "bash",
             [entry.path, ...args],
-            {
-              cwd: childCwd,
-              timeout: entry.timeout,
-              maxBuffer: 10 * 1024 * 1024, // 10MB
-              signal,
-            },
+            execOpts,
             (error, stdout, stderr) => {
               if (error) {
                 resolve({

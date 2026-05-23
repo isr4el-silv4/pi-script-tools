@@ -121,6 +121,30 @@ describe("extension", () => {
     expect(registeredTools[0].description).toContain("tool [args]");
   });
 
+  it("execute handler guards against non-AbortSignal signal", async () => {
+    const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), "pi-test-"));
+    const scriptsDir = path.join(fakeHome, ".pi", "agent", "scripts");
+    fs.mkdirSync(scriptsDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(scriptsDir, "echo-tool.sh"),
+      '#!/bin/bash\n# Name: echo_tool\n# Description: Echo test\necho "works"'
+    );
+    fs.chmodSync(path.join(scriptsDir, "echo-tool.sh"), 0o755);
+
+    jest.spyOn(os, "homedir").mockReturnValue(fakeHome);
+
+    const pi = createMockPi();
+    extensionFactory(pi);
+
+    const ctx = { cwd: fakeHome } as ExtensionContext;
+    await sessionStartHandlers[0]({ type: "session_start", reason: "startup" }, ctx);
+
+    const tool = registeredTools[0];
+    // Simulate a string signal (the bug scenario)
+    const result = await tool.execute("call-1", { args: "" }, "bad-signal" as unknown as AbortSignal, undefined, ctx);
+    expect(result.content).toBe("works\n");
+  });
+
   it("local scripts override global scripts", async () => {
     const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), "pi-test-"));
     const globalScriptsDir = path.join(fakeHome, ".pi", "agent", "scripts");
