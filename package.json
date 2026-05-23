@@ -1,0 +1,23 @@
+{
+  "name": "pi-script-tools",
+  "version": "0.1.0",
+  "description": "Pi extension that auto-discovers shell scripts and registers them as tools",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.0.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.9",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.49"
+  }
+}
