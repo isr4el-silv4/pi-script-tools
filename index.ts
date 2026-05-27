@@ -15,6 +15,74 @@ function textResult(text: string): ToolResult {
 }
 
 /**
+ * Split a string into shell-like arguments, respecting single quotes,
+ * double quotes, and backslash escapes.
+ *
+ * Examples:
+ *   `hello world`           → ["hello", "world"]
+ *   `"hello world" foo`     → ["hello world", "foo"]
+ *   `'hello world' foo`     → ["hello world", "foo"]
+ *   `hello\\ world`          → ["hello world"]
+ */
+function shellSplit(input: string): string[] {
+  const args: string[] = [];
+  let current = "";
+  let i = 0;
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+
+  while (i < input.length) {
+    const ch = input[i];
+
+    if (inSingleQuote) {
+      if (ch === "'") {
+        inSingleQuote = false;
+      } else {
+        current += ch;
+      }
+    } else if (inDoubleQuote) {
+      if (ch === "\\" && i + 1 < input.length) {
+        const next = input[i + 1];
+        if (next === '"' || next === "\\" || next === '$' || next === '`') {
+          current += next;
+          i += 2;
+          continue;
+        }
+      }
+      if (ch === '"') {
+        inDoubleQuote = false;
+      } else {
+        current += ch;
+      }
+    } else {
+      if (ch === "\\" && i + 1 < input.length) {
+        current += input[i + 1];
+        i += 2;
+        continue;
+      } else if (ch === "'") {
+        inSingleQuote = true;
+      } else if (ch === '"') {
+        inDoubleQuote = true;
+      } else if (ch === " " || ch === "\t") {
+        if (current) {
+          args.push(current);
+          current = "";
+        }
+      } else {
+        current += ch;
+      }
+    }
+    i++;
+  }
+
+  if (current) {
+    args.push(current);
+  }
+
+  return args;
+}
+
+/**
  * Build the tool description from metadata.
  */
 function buildDescription(entry: ScriptEntry): string {
@@ -41,7 +109,7 @@ function registerScriptTool(pi: ExtensionAPI, toolName: string, entry: ScriptEnt
       _onUpdate: unknown,
       ctx: ExtensionContext,
     ): Promise<ToolResult> => {
-      const args = params.args ? params.args.split(" ") : [];
+      const args = params.args ? shellSplit(params.args) : [];
       const childCwd = (ctx as ExtensionContext & { cwd?: string }).cwd || process.cwd();
 
       const result = await new Promise<{ stdout: string; stderr: string; code: number | null }>(
