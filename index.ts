@@ -1,6 +1,6 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { Type, Static } from "@sinclair/typebox";
-import { execFile } from "node:child_process";
+import { spawn } from "node:child_process";
 import { discoverScripts, type ScriptEntry } from "./discovery";
 
 const ParamsSchema = Type.Object({
@@ -114,30 +114,38 @@ function registerScriptTool(pi: ExtensionAPI, toolName: string, entry: ScriptEnt
 
       const result = await new Promise<{ stdout: string; stderr: string; code: number | null }>(
         (resolve) => {
-          const execOpts: { cwd: string; timeout: number; maxBuffer: number; signal?: AbortSignal } = {
+          const spawnOpts: { cwd: string; timeout: number; maxBuffer: number; signal?: AbortSignal } = {
             cwd: childCwd,
             timeout: entry.timeout,
             maxBuffer: 10 * 1024 * 1024, // 10MB
           };
           if (signal instanceof AbortSignal) {
-            execOpts.signal = signal;
+            spawnOpts.signal = signal;
           }
-          execFile(
-            "bash",
-            [entry.path, ...args],
-            execOpts,
-            (error, stdout, stderr) => {
-              if (error) {
-                resolve({
-                  stdout: stdout || "",
-                  stderr: stderr || error.message,
-                  code: typeof error.code === "number" ? error.code : null,
-                });
-              } else {
-                resolve({ stdout: stdout || "", stderr: stderr || "", code: 0 });
-              }
-            },
-          );
+          const child = spawn("bash", [entry.path, ...args], spawnOpts);
+          // Pipe first argument to stdin so scripts can read multi-line JSON
+          if (args.length > 0) {
+            child.stdin.write(args[0]);
+          }
+          child.stdin.end();
+          const stdoutParts: Buffer[] = [];
+          const stderrParts: Buffer[] = [];
+          child.stdout.on("data", (d: Buffer) => stdoutParts.push(d));
+          child.stderr.on("data", (d: Buffer) => stderrParts.push(d));
+          child.on("close", (code) => {
+            resolve({
+              stdout: Buffer.concat(stdoutParts).toString("utf-8"),
+              stderr: Buffer.concat(stderrParts).toString("utf-8"),
+              code,
+            });
+          });
+          child.on("error", (err) => {
+            resolve({
+              stdout: Buffer.concat(stdoutParts).toString("utf-8"),
+              stderr: err.message,
+              code: null,
+            });
+          });
         },
       );
 
