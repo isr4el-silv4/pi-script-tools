@@ -1,6 +1,6 @@
 {
   "name": "@isr4el-silv4/pi-script-tools",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Pi extension that auto-discovers shell scripts and registers them as tools",
   "license": "MIT",
   "author": "isr4el-silv4",
@@ -10,6 +10,7 @@
   },
   "keywords": [
     "pi-package",
+    "pi-extension",
     "pi",
     "pi-coding-agent"
   ],
