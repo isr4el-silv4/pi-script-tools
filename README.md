@@ -1,5 +1,7 @@
 # pi-script-tools
 
+![pi-script-tools](https://raw.githubusercontent.com/isr4el-silv4/pi-script-tools/master/screenshot.jpeg)
+
 Auto-discovers `.sh` scripts and registers them as Pi tools, so the LLM can call them alongside built-in tools like `read`, `write`, and `bash`.
 
 ## How It Works
