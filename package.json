@@ -1,14 +1,43 @@
 {
-  "name": "pi-script-tools",
+  "name": "@isr4el-silv4/pi-script-tools",
   "version": "0.1.0",
   "description": "Pi extension that auto-discovers shell scripts and registers them as tools",
+  "license": "MIT",
+  "author": "isr4el-silv4",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isr4el-silv4/pi-script-tools"
+  },
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-coding-agent"
+  ],
+  "files": [
+    "discovery.ts",
+    "index.ts",
+    "metadata.ts",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "jest"
+  },
   "pi": {
     "extensions": [
       "./index.ts"
     ]
   },
-  "scripts": {
-    "test": "jest"
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*",
+    "@sinclair/typebox": "*"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
@@ -16,8 +45,5 @@
     "jest": "^30.4.2",
     "ts-jest": "^29.4.9",
     "typescript": "^5.7.0"
-  },
-  "dependencies": {
-    "@sinclair/typebox": "^0.34.49"
   }
 }
