@@ -1,6 +1,6 @@
 {
   "name": "@isr4el-silv4/pi-script-tools",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Pi extension that auto-discovers shell scripts and registers them as tools",
   "license": "MIT",
   "author": "isr4el-silv4",
@@ -32,7 +32,7 @@
     "extensions": [
       "./index.ts"
     ],
-    "image": "https://raw.githubusercontent.com/isr4el-silv4/pi-script-tools/master/screenshot.jpeg"
+    "image": "https://i.postimg.cc/tgBJFPYh/pi-script-tools.jpg"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",
