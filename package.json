@@ -1,8 +1,8 @@
 {
   "name": "@isr4el-silv4/pi-script-tools",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Pi extension that auto-discovers shell scripts and registers them as tools",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "isr4el-silv4",
   "repository": {
     "type": "git",
