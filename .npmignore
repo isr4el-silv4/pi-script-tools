@@ -1,0 +1,15 @@
+.github/
+.idea/
+node_modules/
+test/
+*.test.ts
+dist/
+coverage/
+.DS_Store
+*.log
+plans/
+package-lock.json
+.github/
+screenshot.jpeg
+jest.config.js
+plan*
